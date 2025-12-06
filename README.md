@@ -1,8 +1,5 @@
-# Blatt2
-
-## Name
-Rede - Portal App
-Es ist eigentlich Bundestagdaten stastitischen Analyse mit Neo4j als Datenbanken
+### Rede - Portal App
+Bundestagdaten stastitischen Analyse mit Neo4j als Datenbanken
 
 ## Description
 Eine Java-Anwendung zur Verarbeitung und Auswertung von Bundestagsdaten.
@@ -23,35 +20,6 @@ Die Datenbankzugriffe sind in eigenen Klassen gekapselt, damit alles übersichtl
 ## Badges
 On some READMEs, you may see small images that convey metadata, such as whether or not all the tests are passing for the project. You can use Shields to add some to your README. Many services also have instructions for adding a badge.
 
-## Visuals
-
-═══════════════════════════════════════════════════════════════════════════════════════
-VERARBEITETE DATEN (PARSING-ERGEBNISSE)
-══════════════════════════════════════════════════════════════════════════════════════
-
-1 .  REDE ID: ID2016200100
---------------------------------------------------------------------------------
-Redner:  Annalena Baerbock
-Fraktion: FRAKTIONSLOS
-Sitzung: WP 20, Sitzung 162
-Datum: 10.04.2024
-Zeit: 13:00 bis 19:40
-Kommentare: 2
-Die Kommentare:
-1. (Beifall beim BÜNDNIS 90/DIE GRÜNEN sowie bei Abgeordneten der SPD und der FDP)
-2. (Annalena Baerbock, Bundesministerin: Können Sie die Uhr vielleicht anstellen? Das wäre dann ein bis...
-
-
-A. DURCHSCHNITTLICHE REDELÄNGE
-════════════════════════════════════════════════════════════════════════════════════════════
-
-### PRO ABGEORDNETEN ###
-------------------------------------------------------------------------------------------
-1. Markus Söder                   (FRAKTIONSLOS        )  10862 Zeichen (1 Reden)
-2. Friedrich Merz                 (CDU/CSU             )  10508 Zeichen (50 Reden)
-3. Bodo Ramelow                   (FRAKTIONSLOS        )  10415 Zeichen (1 Reden)
-4. Eva Högl                       (FRAKTIONSLOS        )  10282 Zeichen (4 Reden)
-5. Daniela Behrens                (FRAKTIONSLOS        )   9373 Zeichen (1 Reden)
 
 ## Installation
 Hier benutze ich:
@@ -94,6 +62,10 @@ Vergleich der Kommentare Häufigkeit zwischen den Fraktionen.
 C. Längste Sitzung
 Nach Zeitdauer der Sitzung.
 Nach Gesamtlänge aller Reden in der Sitzung.
+
+
+## Die Ausgabe
+Die Ausgabe und alle verarbeiteten Daten werden in der Konsole angezeigt
 
 
 ## Support
