@@ -1,0 +1,287 @@
+@startuml
+
+package "org_texttechnologylab_pprblatt2" {
+  package "data" {
+    package "database" {
+      class "Neo4jConnection" as Neo4jConnection {
+        - graphDb: GraphDatabaseService
+        - managementService: DatabaseManagementService
+        + Neo4jConnection(String)
+        + getGraphDb(): GraphDatabaseService
+        + shutdown(): void
+        + importDataComplete(String): void
+        + deleteAllData(): void
+        + createNode(Transaction, String, Map<String, Object>): Node
+        + findOrCreateNode(Transaction, String, String, String, Map<String, Object>): Node
+        + createRelationship(Transaction, Node, Node, String): void
+        - processFileComplete(Transaction, File, Map<String, Node>, Map<String, Node>, Map<String, Node>, Map<String, Node>): int[]
+        - processRedeComplete(Transaction, Element, Node, Map<String, Node>, Map<String, Node>, Map<String, Node>): int[]
+        - parseTimeDataFast(Element, Node): void
+        - processKommentareWithNodes(Transaction, Element, Node): int
+        - createKommentarNode(Transaction, String, Node): void
+        - extractRedeTextSimple(Element): String
+        - processRednerFast(Transaction, Element, Map<String, Node>, Map<String, Node>): Node
+        - getOrCreateFraktionFast(Transaction, String, Map<String, Node>): Node
+        - normalizeFraktionNameFast(String): String
+        - getTextContentFast(Element, String): String
+        - registerShutdownHook(): void
+      }
+    }
+
+
+    package "interfaces" {
+      interface "FraktionIn" as FraktionIn {
+        + getName(): String
+        + toNode(Neo4jConnection, Transaction): Node
+      }
+
+      interface "KommentarIn" as KommentarIn {
+        + getRedner(): Redner
+        + getRede(): Rede
+        + getTextk(): String
+        + fraktion(): Fraktion
+        + toNode(Neo4jConnection, Transaction): Node
+      }
+
+      interface "RedeIn" as RedeIn {
+        + getRid(): String
+        + getRedner(): Redner
+        + getSitzung(): Sitzung
+        + getKommentar(): List<Kommentar>
+        + addKommentar(Kommentar): void
+        + toNode(Neo4jConnection, Transaction): Node
+      }
+
+      interface "RednerIn" as RednerIn {
+        + getTitel(): String
+        + getId(): String
+        + getVorname(): String
+        + getNachname(): String
+        + getFraktion(String): Fraktion
+        + getFullName(): String
+        + toNode(Neo4jConnection, Transaction): Node
+      }
+
+      interface "SitzungIn" as SitzungIn {
+        + getSitzungOrt(): String
+        + getSitzungNr(): String
+        + getWahlperiode(): String
+        + getSitzungDatum(): Date
+        + getStartZeit(): LocalTime
+        + getEndZeit(): LocalTime
+        + toNode(Neo4jConnection, Transaction): Node
+      }
+    }
+
+    package "redenportal" {
+      class "ObjectFactory" as ObjectFactory {
+        - alleRede: List<Rede>
+        - alleRedner: Set<Redner>
+        - alleSitzung: Set<Sitzung>
+        - alleFraktion: Set<Fraktion>
+        - alleKommentar: Set<Kommentar>
+        - rednerMap: Map<String, Redner>
+        - fraktionMap: Map<String, Fraktion>
+        + loadXML(String): void
+        + getAlleRede(): List<Rede>
+        + getAlleRedner(): Set<Redner>
+        + getAlleSitzung(): Set<Sitzung>
+        + getAlleFraktion(): Set<Fraktion>
+        + getAlleKommentar(): Set<Kommentar>
+        + isEmpty(): boolean
+        - parseXMLFile(File, XMLHelper): void
+        - deduplicateRedner(Redner): Redner
+      }
+
+      class "Fraktion" as Fraktion {
+        - namef: String
+        + Fraktion(String)
+        + getName(): String
+        + toString(): String
+        + toJSON(): String
+        + toNode(Neo4jConnection, Transaction): Node
+      }
+
+      class "Kommentar" as Kommentar {
+        - redner: Redner
+        - rede: Rede
+        - fraktion: Fraktion
+        - textk: String
+        + Kommentar(Redner, Rede, Fraktion, String)
+        + getRedner(): Redner
+        + getRede(): Rede
+        + getFraktion(): Fraktion
+        + getTextk(): String
+        + fraktion(): Fraktion
+        + toString(): String
+        + toJSON(): String
+        + toNode(Neo4jConnection, Transaction): Node
+        + static fromNode(Node): Kommentar
+      }
+
+      class "Rede" as Rede {
+        - rid: String
+        - redner: Redner
+        - sitzung: Sitzung
+        - text: String
+        - kommentare: List<Kommentar>
+        + Rede(String, Redner, Sitzung)
+        + getRid(): String
+        + getRedner(): Redner
+        + getSitzung(): Sitzung
+        + getText(): String
+        + setText(String): void
+        + getKommentar(): List<Kommentar>
+        + addKommentar(Kommentar): void
+        + getLaenge(): int
+        + getId(): String
+        + toString(): String
+        + toJSON(): String
+        + toNode(Neo4jConnection, Transaction): Node
+        + static fromNode(Node): Rede
+      }
+
+      class "Redner" as Redner {
+        - id: String
+        - titel: String
+        - vorname: String
+        - nachname: String
+        - fraktion: Fraktion
+        + Redner(String, String, String, String, Fraktion)
+        + getId(): String
+        + getTitel(): String
+        + getVorname(): String
+        + getNachname(): String
+        + getFraktion(): Fraktion
+        + getFraktion(String): Fraktion
+        + getFullName(): String
+        + toString(): String
+        + toJSON(): String
+        + toNode(Neo4jConnection, Transaction): Node
+        + static fromNode(Node): Redner
+      }
+
+      class "Sitzung" as Sitzung {
+        - wahlperiode: String
+        - sitzungNr: String
+        - sitzungOrt: String
+        - sitzungDatum: Date
+        - startZeit: LocalTime
+        - endZeit: LocalTime
+        + Sitzung(String, String, String, Date, LocalTime, LocalTime)
+        + getWahlperiode(): String
+        + getSitzungNr(): String
+        + getSitzungOrt(): String
+        + getSitzungDatum(): Date
+        + getStartZeit(): LocalTime
+        + getEndZeit(): LocalTime
+        - genSitzungId(): String
+        + toString(): String
+        + toJSON(): String
+        + toNode(Neo4jConnection, Transaction): Node
+        + static fromNode(Node): Sitzung
+      }
+    }
+
+    package "statistik" {
+      class "CypherStatistik" as CypherStatistik {
+        - graphDb: GraphDatabaseService
+        + CypherStatistik(Neo4jConnection)
+        + runAllAnalysis(): void
+        + normalizeAllFraktionen(): void
+        - analyseRedelaenge(): void
+        - analyseKommentarHaeufigkeit(): void
+        - analyseLaengsteSitzung(): void
+        - safeGetString(Map<String, Object>, String): String
+        - safeGetLong(Map<String, Object>, String): Long
+        - safeGetDouble(Map<String, Object>, String): Double
+        - normalizeFraktionDisplay(String): String
+        - cleanString(String, int): String
+      }
+    }
+  }
+
+  package "helper" {
+        class "XMLHelper" as XMLHelper {
+          - aktuelleSitzung: Sitzung
+          - aktuellerRootHash: String
+          + parseRedner(Element): Redner
+          + parseSitzung(Element): Sitzung
+          + parseRede(Element, Element): Rede
+          + parseRedeSimple(Element, Element): Rede
+          + extrahiereRedeText(Element): String
+          + parseRedenAusZipDatei(String, int): List<Rede>
+          + parseRedenAusZipDatei(String): List<Rede>
+          + parseRedenAusDateiEinfach(File): List<Rede>
+          + resetCache(): void
+          - getTextContent(Element, String): String
+          - parseRednerAusRede(Element): Redner
+          - parseKommentareforRede(Element, Rede): void
+          - parseKommentareInElement(Element, Rede): void
+          - parseAlleKommentare(Element, Rede): void
+          - erstelleKommentarforRede(String, Rede): void
+          - istGleicherRoot(Element): boolean
+          - generiereRootHash(Element): String
+        }
+
+        class "NormalizeFraktion" as NormalizeFraktion {
+          + FRAKTIONSLOS: String
+          + CDU_CSU: String
+          + SPD: String
+          + GRUENE: String
+          + AFD: String
+          + FDP: String
+          + LINKE: String
+          + BSW: String
+          + normalizeFraktion(String): String
+        }
+      }
+
+  package "utils" {
+    class "MainUbung2" as MainUbung2 {
+      - scanner: Scanner
+      + main(String[]): void
+      + showDetailedParsing(ObjectFactory): void
+      + runStatisticalAnalysis(String): void
+    }
+  }
+}
+
+' Beziehungen
+
+MainUbung2 --> ObjectFactory : verwaltet Parsing
+MainUbung2 --> Neo4jConnection : steuert Datenbank
+MainUbung2 --> CypherStatistik : startet Analyse
+
+ObjectFactory --> XMLHelper : parst mit
+ObjectFactory *-- Rede : erstellt
+ObjectFactory *-- Redner : erstellt
+ObjectFactory *-- Sitzung : erstellt
+ObjectFactory *-- Fraktion : erstellt
+ObjectFactory *-- Kommentar : erstellt
+
+Rede --> Redner : hat Redner
+Rede --> Sitzung : in Sitzung
+Rede *-- Kommentar : enthält
+Redner --> Fraktion : Mitglied von
+
+Neo4jConnection --> Rede : speichert
+Neo4jConnection --> Redner : speichert
+Neo4jConnection --> Sitzung : speichert
+Neo4jConnection --> Fraktion : speichert
+Neo4jConnection --> Kommentar : speichert
+
+CypherStatistik --> Neo4jConnection : analysiert
+
+XMLHelper ..> NormalizeFraktion : nutzt
+Neo4jConnection ..> NormalizeFraktion : nutzt
+CypherStatistik ..> NormalizeFraktion : nutzt
+
+Fraktion .up.|> FraktionIn
+Kommentar .up.|> KommentarIn
+Rede .up.|> RedeIn
+Redner .up.|> RednerIn
+Sitzung .up.|> SitzungIn
+
+@enduml
+

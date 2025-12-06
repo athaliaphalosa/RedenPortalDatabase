@@ -1,0 +1,37 @@
+@startuml
+
+left to right direction
+
+actor Benutzer
+actor System
+
+rectangle "Reden - Portal" {
+
+    Benutzer --> (Statistische Auswertung)
+    Benutzer --> (Program Starten)
+    Benutzer --> (Parsing Ergebnisse Anzeigen)
+
+    (Program Starten) ..> (XML Daten Parsing) : <<include>>
+    (Statistische Auswertung) ..> (Länge Sitzung) : <<include>>
+    (Länge Sitzung) ..> (Häufigkeit pro Rede) : <<include>>
+    (Länge Sitzung) ..> (Durchschnittliche Redelänge) : <<include>>
+
+
+    System --> (XML-Dateien einlesen)
+    System --> (Daten in Neo4j importieren)
+    System --> (Neo4j Datenbank abfragen)
+
+    (Daten in Neo4j importieren) ..> (Datenbank löschen) : <<include>>
+    (Daten in Neo4j importieren) ..> (Graph Relationships erstellen) : <<include>>
+    (Neo4j Datenbank abfragen) ..> (Cypher Queries ausführen) : <<include>>
+
+    (XML-Dateien einlesen) .u. (Fehler/Error wird geezeigt) : <<extend>>
+
+    note right of (Fehler/Error wird geezeigt)
+    [wenn die XML Datei kaputt ist]
+    end note
+
+
+    }
+
+@enduml
